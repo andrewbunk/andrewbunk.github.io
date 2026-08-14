@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYC Housing &amp; Transit Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F4F6; --panel:#FFFFFF; --ink:#171A21; --muted:#59616F; --hair:#E0E3E8;
+    --rental:#24476B; --transit:#E8541E; --through:#0E9E9E;
+    --rental-soft:#E7EDF3; --transit-soft:#FBE7DE; --through-soft:#DDF0F0;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+    --disp:'Instrument Serif',Georgia,serif;
+    --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.55;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  a{color:inherit}
+
+  /* hero */
+  .hero{padding:64px 0 30px;border-bottom:1px solid var(--hair)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  h1{font-family:var(--disp);font-weight:400;font-size:64px;line-height:1.0;letter-spacing:-.01em;margin:0 0 20px;max-width:14ch}
+  .lede{font-size:17px;color:var(--muted);max-width:640px;margin:0}
+  .lede b{color:var(--ink);font-weight:600}
+
+  /* system diagram */
+  .system{padding:30px 0 8px}
+  .system-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+  #flow{width:100%;height:150px;display:block;max-width:720px}
+
+  /* cards */
+  .models{padding:26px 0 10px;display:flex;flex-direction:column;gap:18px}
+  .card{display:block;background:var(--panel);border:1px solid var(--hair);border-radius:18px;padding:26px 28px;text-decoration:none;color:inherit;transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(20,25,35,.08)}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .card.rental::before{background:var(--rental)} .card.rental:hover{border-color:var(--rental)}
+  .card.transit::before{background:var(--transit)} .card.transit:hover{border-color:var(--transit)}
+  .card.through::before{background:var(--through)} .card.through:hover{border-color:var(--through)}
+  .card-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:14px}
+  .rental .card-tag{background:var(--rental-soft);color:var(--rental)}
+  .transit .card-tag{background:var(--transit-soft);color:#B23A12}
+  .through .card-tag{background:var(--through-soft);color:#0A7A7A}
+  .card h2{font-family:var(--disp);font-weight:400;font-size:33px;line-height:1.05;margin:0 0 8px;letter-spacing:-.01em}
+  .card .desc{font-size:14.5px;color:var(--muted);max-width:600px;margin:0 0 18px;line-height:1.5}
+  .card .desc b{color:var(--ink);font-weight:600}
+  .feats{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 20px;padding:0;list-style:none}
+  .feats li{font-family:var(--mono);font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .feats li::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5}
+  .launch{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600}
+  .rental .launch{color:var(--rental)} .transit .launch{color:#B23A12} .through .launch{color:#0A7A7A}
+  .launch .arrow{transition:transform .16s ease}
+  .card:hover .launch .arrow{transform:translateX(4px)}
+  .card.featured{padding-bottom:28px}
+  .card.featured h2{font-size:38px}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.pair{grid-template-columns:1fr}; h1{font-size:44px}; .card.featured h2{font-size:30px}}
+
+  /* principles */
+  .principles{padding:28px 0 70px;margin-top:14px;border-top:1px solid var(--hair)}
+  .principles h3{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:22px 0 16px}
+  .plist{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:720px){.plist{grid-template-columns:1fr}}
+  .plist .p-t{font-family:var(--disp);font-size:20px;margin:0 0 5px}
+  .plist .p-d{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+  .foot{margin-top:34px;font-size:12px;color:var(--muted);line-height:1.6;max-width:720px}
+  .foot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow"><i style="background:var(--rental)"></i><i style="background:var(--transit)"></i><i style="background:var(--through)"></i>Policy reasoning aids · New York</p>
+    <h1>What actually moves New York rents</h1>
+    <p class="lede">Three connected models for thinking about the same question from different angles: how much housing New York needs, and which levers — building, transit, and how fast we run it — actually change rents, condition, and who gets to stay. Each is a <b>reasoning aid, not a forecast</b>: every assumption is a dial you can turn, sourced to the empirical record.</p>
+  </div>
+
+  <div class="system">
+    <p class="system-label">How they connect</p>
+    <svg id="flow" viewBox="0 0 720 150" role="img" aria-label="Two transit models — transit delivery and through-running — feed housing-capacity inputs into the rental market model.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <!-- transit delivery -->
+      <rect x="8" y="16" width="212" height="42" rx="9" fill="#FFFFFF" stroke="var(--transit)" stroke-width="1.5"/>
+      <text x="114" y="42" text-anchor="middle" font-family="var(--body),sans-serif" font-size="13" font-weight="600" fill="#171A21">Transit delivery</text>
+      <!-- through-running -->
+      <rect x="8" y="92" width="212" height="42" rx="9" fill="#FFFFFF" stroke="var(--through)" stroke-width="1.5"/>
+      <text x="114" y="118" text-anchor="middle" font-family="var(--body),sans-serif" font-size="13" font-weight="600" fill="#171A21">Through-running</text>
+      <!-- rental hub -->
+      <rect x="470" y="42" width="242" height="66" rx="11" fill="#24476B"/>
+      <text x="591" y="70" text-anchor="middle" font-family="var(--body),sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Rental market model</text>
+      <text x="591" y="90" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10.5" fill="#B8C6D8">rents · condition · displacement</text>
+      <!-- arrows -->
+      <path d="M220 37 C 330 37, 360 66, 468 72" fill="none" stroke="var(--transit)" stroke-width="2" marker-end="url(#ar)"/>
+      <path d="M220 113 C 330 113, 360 82, 468 80" fill="none" stroke="var(--through)" stroke-width="2" marker-end="url(#ar)"/>
+      <text x="345" y="30" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="#8A92A0">permit floor · suburban build</text>
+      <text x="345" y="132" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="#8A92A0">demand relief · utilization</text>
+    </svg>
+  </div>
+
+  <div class="models">
+
+    <a class="card rental featured" href="nyc-rental-supply-simulator.html">
+      <span class="card-tag">The core model</span>
+      <h2>NYC Rental Supply Simulator</h2>
+      <p class="desc">The destination. A stock-and-flow model of the rental market: set a permit rate and rezoning, and watch when vacancy troughs, when rents ease, what happens to housing condition, and how many households get priced out. Includes a <b>Policies tab</b> with the enacted reforms as toggles, and a <b>Model internals tab</b> exposing every calibration constant, each sourced.</p>
+      <ul class="feats">
+        <li>vacancy, rent &amp; condition trajectories</li>
+        <li>freeze, IAI &amp; warehouse mechanics</li>
+        <li>income-anchored out-migration</li>
+        <li>13 policy presets + your own</li>
+      </ul>
+      <span class="launch">Open the simulator <span class="arrow">→</span></span>
+    </a>
+
+    <div class="pair">
+      <a class="card transit" href="transit-delivery-model.html">
+        <span class="card-tag">Feeds the core · build new</span>
+        <h2>Transit Delivery Model</h2>
+        <p class="desc">New lines, and why they cost and take what they do. Delivery time and cost are <b>policy variables</b>, not physics — compress the review-and-station overhang toward the global frontier and the same budget buys several times the transit, years sooner. Built-in IBX and Second Avenue Subway examples.</p>
+        <ul class="feats">
+          <li>compressible delivery strip-map</li>
+          <li>station &amp; soft-cost premiums</li>
+          <li>housing handoff by opening year</li>
+        </ul>
+        <span class="launch">Open the model <span class="arrow">→</span></span>
+      </a>
+
+      <a class="card through" href="through-running-housing-model.html">
+        <span class="card-tag">Feeds the core · run it better</span>
+        <h2>Through-Running Housing Model</h2>
+        <p class="desc">Run Penn Station's three railroads <b>through</b> instead of terminating, and every regional home reaches far more jobs in the same time — unlocking housing markets across the region and bleeding demand off NYC. Operations, not construction: the cheapest, fastest lever. After ETA &amp; Momentum.</p>
+        <ul class="feats">
+          <li>region stitched through Penn</li>
+          <li>job-accessibility engine</li>
+          <li>governance as a real dial</li>
+        </ul>
+        <span class="launch">Open the model <span class="arrow">→</span></span>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="principles">
+    <h3>What these share</h3>
+    <div class="plist">
+      <div>
+        <p class="p-t">Dials, not verdicts</p>
+        <p class="p-d">Every contested number is adjustable. If you distrust a coefficient, change it and watch — the tools are built to be interrogated, not believed.</p>
+      </div>
+      <div>
+        <p class="p-t">Sourced to the record</p>
+        <p class="p-d">Defaults are anchored to published research — HVS, the Transit Costs Project, ETA, and more — with the citations listed inside each model.</p>
+      </div>
+      <div>
+        <p class="p-t">Honest about limits</p>
+        <p class="p-d">They show costs alongside benefits, name what they can't see, and stay directional. A reasoning aid that flatters one answer isn't one.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
